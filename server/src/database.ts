@@ -1,23 +1,5 @@
-import connect, { DatabaseConnection, sql } from "@databases/sqlite";
+import { PrismaClient } from "@prisma/client";
 
-let db: DatabaseConnection;
-let initialized = false;
+let prisma = new PrismaClient();
 
-export const getDatabase = async () => {
-	db = db || connect("../../db.sqlite");
-
-	if (!initialized) {
-		await db.query(sql`
-    CREATE TABLE IF NOT EXISTS payments (
-      id TEXT PRIMARY KEY,
-      title TEXT,
-      category TEXT,
-      amount NUMERIC NOT NULL,
-      date DATETIME NOT NULL
-    )`);
-
-		initialized = true;
-	}
-
-	return db;
-};
+export default prisma;

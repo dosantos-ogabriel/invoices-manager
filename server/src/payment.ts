@@ -1,53 +1,26 @@
-import { DatabaseConnection, sql } from "@databases/sqlite";
-import { randomUUID } from "node:crypto";
 import { z } from "zod";
+import prisma from "./database";
+import { Prisma } from "@prisma/client";
 
-interface Payment {
-	id: string;
-	title?: string;
-	category?: string;
-	amount: number;
-	date: Date;
+class Payment {
+	async list() {
+		const payments = await prisma.payment.findMany();
+		return payments;
+	}
+
+	async addPayment(data: Prisma.PaymentCreateInput) {
+		const addPaymentSchema = z.object({
+			title: z.string().optional(),
+			category: z.string().optional(),
+			amount: z.number().nonnegative(),
+			date: z.coerce.date(),
+		});
+
+		data = addPaymentSchema.parse(data);
+
+		const payment = await prisma.payment.create({ data });
+		return payment;
+	}
 }
 
-interface AddPayment {
-	title?: string;
-	category?: string;
-	amount: number;
-	date: Date;
-}
-
-const addPaymentSchema = z.object({
-	title: z.string().optional(),
-	category: z.string().optional(),
-	amount: z.number().nonnegative(),
-	date: z.coerce.date(),
-});
-
-export async function list(db: DatabaseConnection) {
-	return db.query(sql`SELECT * FROM payments`);
-}
-
-export async function add(db: DatabaseConnection, data: AddPayment) {
-	const params = addPaymentSchema.parse(data);
-
-	const payment: Payment = {
-		id: randomUUID(),
-		...params,
-	};
-
-	await db.query(sql`INSERT INTO payments (
-      id,
-      title,
-      category,
-      amount,
-      date
-    ) VALUES (
-      ${payment.id},
-      ${payment.title},
-      ${payment.category},
-      ${payment.amount},
-      ${payment.date}
-    )`);
-	return payment;
-}
+export default new Payment();
