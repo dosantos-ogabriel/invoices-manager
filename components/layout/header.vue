@@ -2,8 +2,9 @@
 const links = [
   [
     {
-      label: "Faturas",
-      icon: "material-symbols:order-approve-outline",
+      label: "Pagamentos",
+      icon: "material-symbols:payments-outline",
+      to: "/pagamentos",
     },
   ],
   [
