@@ -27,7 +27,7 @@ const submit = async () => {
     <form @submit.prevent>
       <u-input id="amount" v-model="form.amount" type="number" name="amount" />
       <u-input id="date" v-model="form.date" type="date" name="date" />
-      <button @click="submit">Enviar</button>
+      <u-button @click="submit">Enviar</u-button>
     </form>
     <div v-if="pending">Carregando...</div>
     <div v-else-if="payments && payments.length">
