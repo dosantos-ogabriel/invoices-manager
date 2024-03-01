@@ -18,7 +18,7 @@ const links = [
 </script>
 
 <template>
-  <header class="border-b border-gray-200 dark:border-gray-800">
+  <header class="border-b border-gray-200 dark:border-gray-700">
     <u-container>
       <UHorizontalNavigation :links="links" />
     </u-container>

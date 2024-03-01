@@ -3,7 +3,9 @@
     <layout-header />
 
     <u-container>
-      <slot />
+      <main class="py-4">
+        <slot />
+      </main>
     </u-container>
   </div>
 </template>
