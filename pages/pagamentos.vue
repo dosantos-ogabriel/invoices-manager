@@ -10,20 +10,20 @@ const tableData = computed(() => {
 
 const columns = [
   {
-    key: "title",
-    label: "Título",
-  },
-  {
-    key: "category",
-    label: "Categoria",
+    key: "date",
+    label: "Data",
   },
   {
     key: "amount",
     label: "Valor",
   },
   {
-    key: "date",
-    label: "Data",
+    key: "title",
+    label: "Título",
+  },
+  {
+    key: "category",
+    label: "Categoria",
   },
 ];
 
@@ -43,7 +43,12 @@ const file = ref(null);
 
     <div v-if="pending">Carregando...</div>
 
-    <u-table v-else-if="payments && payments.length" :columns="columns" :rows="tableData" />
+    <u-table
+      v-else-if="payments && payments.length"
+      :columns="columns"
+      :rows="tableData"
+      :sort="{ column: 'date', direction: 'desc' }"
+    />
 
     <div v-else>Nenhum pagamento</div>
 
