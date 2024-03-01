@@ -10,7 +10,6 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@databases/sqlite": "^4.0.2",
     "@prisma/client": "^5.10.2",
     "nuxt": "^3.10.3",
     "vue": "^3.4.19",
