@@ -3,3 +3,15 @@ export const formatDate = (date: Date) => {
     dateStyle: "short",
   }).format(date);
 };
+
+export const readFileURL = (fileToRead: File) => {
+  return new Promise((resolve) => {
+    const fReader = new FileReader();
+
+    fReader.onload = () => {
+      resolve(fReader.result);
+    };
+
+    fReader.readAsDataURL(fileToRead);
+  });
+};

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { formatDate } from "#imports";
+import { formatDate } from "~/utils";
 
 const { pending, data: payments } = useAsyncData(async () => $fetch("/api/payments"));
 
@@ -28,7 +28,8 @@ const columns = [
 ];
 
 const importModal = ref(false);
-const file = ref(null);
+
+const file = ref("");
 </script>
 
 <template>
@@ -67,20 +68,15 @@ const file = ref(null);
           </div>
         </template>
 
-        <input type="file" accept=".csv" />
+        <input-file v-model="file" :multiple="true" />
 
         <template #footer>
           <div class="flex items-center justify-end gap-4">
             <u-button color="gray" label="Cancelar" @click="importModal = false" />
-            <u-button label="Importar" disabled />
+            <u-button label="Importar" :disabled="!file" />
           </div>
         </template>
       </u-card>
     </u-modal>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.invoices-page {
-}
-</style>
