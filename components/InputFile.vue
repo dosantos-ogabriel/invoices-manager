@@ -1,6 +1,6 @@
 <script setup>
 import { defineEmits } from "vue";
-import { readFileURL } from "~/utils";
+import { readFileBinary } from "~/utils";
 
 const emit = defineEmits(["update:modelValue"]);
 const modelValue = defineModel({ type: [String, Array] });
@@ -27,12 +27,12 @@ const inputFile = async (e) => {
   try {
     if (props.multiple) {
       fileName.value = Array.from(files).map((f) => f.name);
-      value = await Promise.all(Array.from(files).map((file) => readFileURL(file)));
+      value = await Promise.all(Array.from(files).map((file) => readFileBinary(file)));
     } else {
       const fileToRead = files[0];
 
       fileName.value = fileToRead.name;
-      value = await readFileURL(fileToRead);
+      value = await readFileBinary(fileToRead);
     }
 
     emit("update:modelValue", value);
