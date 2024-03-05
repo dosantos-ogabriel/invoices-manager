@@ -12,7 +12,7 @@ class Payment {
     const addPaymentSchema = z.object({
       title: z.string().optional(),
       category: z.string().optional(),
-      amount: z.number().nonnegative(),
+      amount: z.number(),
       date: z.coerce.date(),
     });
 

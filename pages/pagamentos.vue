@@ -1,5 +1,6 @@
-<script setup lang="ts">
+<script setup>
 import { formatDate } from "~/utils";
+import importNubank from "~/utils/fileImport/importNubank";
 
 const { pending, data: payments } = useAsyncData(async () => $fetch("/api/payments"));
 
@@ -29,12 +30,24 @@ const columns = [
 
 const importModal = ref(false);
 
-const file = ref("");
+const files = ref([]);
+
+const importFiles = async () => {
+  try {
+    const payments = await importNubank(files.value[0]);
+
+    Promise.all(payments.map((payment) => $fetch("/api/payments/create", { method: "post", body: payment })));
+
+    $nuxt.refresh();
+  } catch (e) {
+    console.log(e);
+  }
+};
 </script>
 
 <template>
   <div class="invoices-page">
-    <h1 class="text-xl font-semibold">Faturas</h1>
+    <h1 class="text-xl font-semibold">Pagamentos</h1>
     <u-divider class="mb-6 mt-2" />
 
     <div class="flex justify-between mb-6">
@@ -68,12 +81,12 @@ const file = ref("");
           </div>
         </template>
 
-        <input-file v-model="file" :multiple="true" />
+        <input-file v-model="files" :multiple="true" />
 
         <template #footer>
           <div class="flex items-center justify-end gap-4">
             <u-button color="gray" label="Cancelar" @click="importModal = false" />
-            <u-button label="Importar" :disabled="!file" />
+            <u-button label="Importar" :disabled="!files.length" @click.prevent="importFiles" />
           </div>
         </template>
       </u-card>

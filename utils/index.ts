@@ -15,3 +15,15 @@ export const readFileURL = (fileToRead: File) => {
     fReader.readAsDataURL(fileToRead);
   });
 };
+
+export const readFileAsString = (fileToRead: File) => {
+  return new Promise((resolve) => {
+    const fReader = new FileReader();
+
+    fReader.onload = () => {
+      resolve(fReader.result);
+    };
+
+    fReader.readAsText(fileToRead, "utf-8");
+  });
+};

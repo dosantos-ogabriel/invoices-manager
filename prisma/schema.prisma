@@ -19,4 +19,15 @@ model Payment {
   category String?
   amount   Float
   date     DateTime
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+  invoiceId String
+}
+
+model Invoice {
+  id   String   @id @default(uuid())
+  bank String
+  date DateTime
+
+  payments Payment[]
 }
