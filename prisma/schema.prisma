@@ -25,9 +25,10 @@ model Payment {
 }
 
 model Invoice {
-  id   String   @id @default(uuid())
-  bank String
-  date DateTime
+  id    String @id @default(uuid())
+  bank  String
+  year  Int
+  month Int
 
   payments Payment[]
 }

@@ -1,6 +1,6 @@
 const nubankColumns = ["date", "title", "amount", "category"];
 
-export default async (fileBinary) => {
+export const getPayments = async (fileBinary) => {
   const lines = fileBinary.split("\n");
 
   const columns = lines[0].split(",");
@@ -27,4 +27,20 @@ export default async (fileBinary) => {
       return undefined;
     })
     .filter((l) => !!l);
+};
+
+export const getInvoice = async (fileName) => {
+  const nubankFile = new RegExp(/nubank-\d+-\d+.csv/);
+
+  const validFileName = nubankFile.test(fileName);
+
+  if (!validFileName)
+    throw new Error('Fazer upload de arquivo com nome padrão para arquivos nubank: "nubank-[ano]-[mês].csv"');
+
+  const array = fileName.slice(0, -4).split("-"),
+    bank = array[0],
+    year = parseInt(array[1]),
+    month = parseInt(array[2]);
+
+  return { bank, year, month };
 };

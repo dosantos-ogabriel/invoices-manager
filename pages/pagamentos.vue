@@ -1,6 +1,6 @@
 <script setup>
 import { formatDate } from "~/utils";
-import importNubank from "~/utils/fileImport/importNubank";
+import { getInvoice, getPayments } from "~/utils/fileImport/importNubank";
 
 const { pending, data: payments } = useAsyncData(async () => $fetch("/api/payments"));
 
@@ -31,14 +31,23 @@ const columns = [
 const importModal = ref(false);
 
 const files = ref([]);
+const fileNames = ref([]);
 
 const importFiles = async () => {
   try {
-    const payments = await importNubank(files.value[0]);
+    files.value.forEach(async (file, index) => {
+      const fileName = fileNames.value[index];
+      const invoiceData = await getInvoice(fileName);
+      const invoice = await $fetch("/api/invoices/create", { method: "post", body: invoiceData });
 
-    Promise.all(payments.map((payment) => $fetch("/api/payments/create", { method: "post", body: payment })));
+      const payments = await getPayments(file);
 
-    $nuxt.refresh();
+      Promise.all(
+        payments.map((payment) =>
+          $fetch("/api/payments/create", { method: "post", body: { ...payment, invoiceId: invoice.id } }),
+        ),
+      );
+    });
   } catch (e) {
     console.log(e);
   }
@@ -81,7 +90,7 @@ const importFiles = async () => {
           </div>
         </template>
 
-        <input-file v-model="files" :multiple="true" />
+        <input-file v-model="files" :multiple="true" @update:file-name="(v) => (fileNames = v)" />
 
         <template #footer>
           <div class="flex items-center justify-end gap-4">

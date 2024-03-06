@@ -8,15 +8,16 @@ class Payment {
     return payments;
   }
 
-  async addPayment(data: Prisma.PaymentCreateInput) {
+  async addPayment(body: Prisma.PaymentCreateInput) {
     const addPaymentSchema = z.object({
       title: z.string().optional(),
       category: z.string().optional(),
       amount: z.number(),
       date: z.coerce.date(),
+      invoiceId: z.string(),
     });
 
-    data = addPaymentSchema.parse(data);
+    const data = addPaymentSchema.parse(body);
 
     const payment = await prisma.payment.create({ data });
     return payment;

@@ -2,7 +2,7 @@
 import { defineEmits } from "vue";
 import { readFileAsString } from "~/utils";
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue", "update:fileName"]);
 const modelValue = defineModel({ type: [String, Array] });
 const props = defineProps({
   accept: {
@@ -35,6 +35,7 @@ const inputFile = async (e) => {
       value = await readFileAsString(fileToRead);
     }
 
+    emit("update:fileName", fileName.value);
     emit("update:modelValue", value);
   } catch {
     console.log("Erro ao adicionar arquivos");
@@ -43,6 +44,8 @@ const inputFile = async (e) => {
 
 const removeFile = (index) => {
   fileName.value = Array.from(fileName.value).toSpliced(index, 1);
+
+  emit("update:fileName", fileName.value);
   emit("update:modelValue", Array.from(modelValue.value).toSpliced(index, 1));
 };
 </script>
