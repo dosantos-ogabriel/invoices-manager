@@ -4,7 +4,9 @@ import { Prisma } from "@prisma/client";
 
 class Invoice {
   async list() {
-    const invoices = await prisma.invoice.findMany();
+    const invoices = await prisma.invoice.findMany({
+      orderBy: [{ year: "desc" }, { month: "desc" }],
+    });
     return invoices;
   }
 

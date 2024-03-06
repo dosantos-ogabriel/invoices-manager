@@ -6,6 +6,11 @@ const links = [
       icon: "material-symbols:payments-outline",
       to: "/pagamentos",
     },
+    {
+      label: "Faturas",
+      icon: "material-symbols:order-approve-outline",
+      to: "/faturas",
+    },
   ],
   [
     {

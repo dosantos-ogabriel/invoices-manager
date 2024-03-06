@@ -13,19 +13,15 @@ const columns = [
   {
     key: "date",
     label: "Data",
+    sortable: true,
   },
   {
     key: "amount",
     label: "Valor",
+    sortable: true,
   },
-  {
-    key: "title",
-    label: "Título",
-  },
-  {
-    key: "category",
-    label: "Categoria",
-  },
+  { key: "title", label: "Título" },
+  { key: "category", label: "Categoria", sortable: true },
 ];
 
 const importModal = ref(false);
@@ -55,7 +51,7 @@ const importFiles = async () => {
 </script>
 
 <template>
-  <div class="invoices-page">
+  <div class="payments-page">
     <h1 class="text-xl font-semibold">Pagamentos</h1>
     <u-divider class="mb-6 mt-2" />
 
