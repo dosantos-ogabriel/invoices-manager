@@ -2,10 +2,20 @@
 import { formatDate, paginate } from "~/utils";
 import { getInvoice, getPayments } from "~/utils/fileImport/importNubank";
 
-const { pending, data: payments } = useAsyncData(async () => $fetch("/api/payments"));
+const { data: payments } = useAsyncData(async () => $fetch("/api/payments"));
+
+const { data: invoices } = useAsyncData(async () => $fetch("/api/invoices"));
+const invoicesOptions = computed(() => {
+  if (!invoices.value) return [];
+  return invoices.value.map(({ id, bank, month, year }) => ({ id, label: `${bank} - ${month}/${year}` }));
+});
+
+const invoice = ref({});
+watch(invoice, async ({ id }) => {
+  payments.value = await $fetch("/api/payments", { query: { invoiceId: id } });
+});
 
 const currentPage = ref(1);
-
 const tableData = computed(() => {
   if (!payments.value) return [];
   return paginate(payments.value, currentPage.value).map((i) => ({
@@ -14,37 +24,30 @@ const tableData = computed(() => {
     date: formatDate(new Date(i.date)),
   }));
 });
-
 const columns = [
-  { key: "title", label: "Título" },
-  { key: "amount", label: "Valor" },
   { key: "date", label: "Data" },
+  { key: "amount", label: "Valor" },
+  { key: "title", label: "Título" },
   { key: "category", label: "Categoria" },
 ];
 
 const importModal = ref(false);
-
 const files = ref([]);
 const fileNames = ref([]);
-
 const importFiles = async () => {
-  try {
-    files.value.forEach(async (file, index) => {
-      const fileName = fileNames.value[index];
-      const invoiceData = await getInvoice(fileName);
-      const invoice = await $fetch("/api/invoices/create", { method: "post", body: invoiceData });
+  files.value.forEach(async (file, index) => {
+    const fileName = fileNames.value[index];
+    const invoiceData = await getInvoice(fileName);
+    const invoice = await $fetch("/api/invoices/create", { method: "post", body: invoiceData });
 
-      const payments = await getPayments(file);
+    const payments = await getPayments(file);
 
-      Promise.all(
-        payments.map((payment) =>
-          $fetch("/api/payments/create", { method: "post", body: { ...payment, invoiceId: invoice.id } }),
-        ),
-      );
-    });
-  } catch (e) {
-    console.log(e);
-  }
+    Promise.all(
+      payments.map((payment) =>
+        $fetch("/api/payments/create", { method: "post", body: { ...payment, invoiceId: invoice.id } }),
+      ),
+    );
+  });
 };
 </script>
 
@@ -54,13 +57,18 @@ const importFiles = async () => {
     <u-divider class="mb-6 mt-2" />
 
     <div class="flex justify-between mb-6">
-      <span></span>
+      <div class="flex items-center gap-2">
+        <u-select-menu
+          v-if="invoices && invoices.length"
+          v-model="invoice"
+          :options="invoicesOptions"
+          placeholder="Selecionar fatura"
+        />
+      </div>
       <u-button icon="material-symbols:drive-folder-upload-outline" label="Importar" @click="importModal = true" />
     </div>
 
-    <div v-if="pending">Carregando...</div>
-
-    <u-table v-else-if="payments && payments.length" :columns="columns" :rows="tableData" />
+    <u-table v-if="payments && payments.length" :columns="columns" :rows="tableData" />
 
     <div v-else>Nenhum pagamento</div>
 

@@ -3,8 +3,8 @@ import prisma from "./database";
 import { Prisma } from "@prisma/client";
 
 class Payment {
-  async list() {
-    const payments = await prisma.payment.findMany({ orderBy: { date: "desc" } });
+  async list(query: Prisma.PaymentWhereInput) {
+    const payments = await prisma.payment.findMany({ orderBy: { date: "desc" }, where: query });
     return payments;
   }
 
