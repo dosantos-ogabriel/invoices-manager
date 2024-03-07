@@ -1,27 +1,25 @@
 <script setup>
-import { formatDate } from "~/utils";
+import { formatDate, paginate } from "~/utils";
 import { getInvoice, getPayments } from "~/utils/fileImport/importNubank";
 
 const { pending, data: payments } = useAsyncData(async () => $fetch("/api/payments"));
 
+const currentPage = ref(1);
+
 const tableData = computed(() => {
   if (!payments.value) return [];
-  return payments.value.map((i) => ({ ...i, amount: i.amount.toFixed(2), date: formatDate(new Date(i.date)) }));
+  return paginate(payments.value, currentPage.value).map((i) => ({
+    ...i,
+    amount: i.amount.toFixed(2),
+    date: formatDate(new Date(i.date)),
+  }));
 });
 
 const columns = [
-  {
-    key: "date",
-    label: "Data",
-    sortable: true,
-  },
-  {
-    key: "amount",
-    label: "Valor",
-    sortable: true,
-  },
   { key: "title", label: "Título" },
-  { key: "category", label: "Categoria", sortable: true },
+  { key: "amount", label: "Valor" },
+  { key: "date", label: "Data" },
+  { key: "category", label: "Categoria" },
 ];
 
 const importModal = ref(false);
@@ -62,14 +60,13 @@ const importFiles = async () => {
 
     <div v-if="pending">Carregando...</div>
 
-    <u-table
-      v-else-if="payments && payments.length"
-      :columns="columns"
-      :rows="tableData"
-      :sort="{ column: 'date', direction: 'desc' }"
-    />
+    <u-table v-else-if="payments && payments.length" :columns="columns" :rows="tableData" />
 
     <div v-else>Nenhum pagamento</div>
+
+    <div class="flex justify-center my-5">
+      <u-pagination v-model="currentPage" :page-count="20" :total="payments.length" />
+    </div>
 
     <u-modal v-model="importModal">
       <u-card>

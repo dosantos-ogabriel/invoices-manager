@@ -27,3 +27,7 @@ export const readFileAsString = (fileToRead: File) => {
     fReader.readAsText(fileToRead, "utf-8");
   });
 };
+
+export const paginate = (data: unknown[], currentPage: number, itemsPerPage = 20) => {
+  return data.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+};

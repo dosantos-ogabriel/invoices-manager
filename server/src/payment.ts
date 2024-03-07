@@ -4,7 +4,7 @@ import { Prisma } from "@prisma/client";
 
 class Payment {
   async list() {
-    const payments = await prisma.payment.findMany();
+    const payments = await prisma.payment.findMany({ orderBy: { date: "desc" } });
     return payments;
   }
 
