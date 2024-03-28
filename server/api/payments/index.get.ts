@@ -8,5 +8,5 @@ export default defineEventHandler(async (event) => {
 
   const query = await getValidatedQuery(event, (q) => queryFormat.parse(q));
 
-  return payment.list(query);
+  return payment.list({ ...query, amount: { gt: 0 } });
 });

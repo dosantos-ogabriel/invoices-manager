@@ -1,5 +1,4 @@
 <script setup>
-import { defineEmits } from "vue";
 import { readFileAsString } from "~/utils";
 
 const emit = defineEmits(["update:modelValue", "update:fileName"]);

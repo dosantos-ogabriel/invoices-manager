@@ -11,6 +11,11 @@ const links = [
       icon: "material-symbols:order-approve-outline",
       to: "/faturas",
     },
+    {
+      label: "Gráficos",
+      icon: "material-symbols:bar-chart",
+      to: "/graficos",
+    },
   ],
   [
     {
