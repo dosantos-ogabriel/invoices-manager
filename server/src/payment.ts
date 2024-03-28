@@ -1,6 +1,6 @@
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import prisma from "./database";
-import { Prisma } from "@prisma/client";
 
 class Payment {
   async list(query: Prisma.PaymentWhereInput) {
@@ -21,6 +21,11 @@ class Payment {
 
     const payment = await prisma.payment.create({ data });
     return payment;
+  }
+
+  async getCategories() {
+    const categories = await prisma.payment.groupBy({ by: ["category"], where: { amount: { gt: 0 } } });
+    return categories;
   }
 }
 

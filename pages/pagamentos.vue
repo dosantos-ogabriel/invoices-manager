@@ -1,35 +1,32 @@
 <script setup>
-import { formatDate, paginate } from "~/utils";
 import { getInvoice, getPayments } from "~/utils/fileImport/importNubank";
 
 const { data: payments } = useAsyncData(async () => $fetch("/api/payments"));
-
 const { data: invoices } = useAsyncData(async () => $fetch("/api/invoices"));
+const { data: categories } = useAsyncData(async () => $fetch("/api/payments/categories"));
+
+const filters = reactive({
+  invoice: { id: "", label: "Todas as faturas" },
+  category: { id: "", label: "Todas as categorias" },
+});
+
 const invoicesOptions = computed(() => {
   if (!invoices.value) return [];
-  return invoices.value.map(({ id, bank, month, year }) => ({ id, label: `${bank} - ${month}/${year}` }));
+  return [
+    { id: "", label: "Todas as faturas" },
+    ...invoices.value.map(({ id, bank, month, year }) => ({ id, label: `${bank} - ${month}/${year}` })),
+  ];
+});
+const categoryOptions = computed(() => {
+  if (!categories.value) return [];
+  return categories.value.map((c) => ({ id: c, label: c }));
 });
 
-const invoice = ref({});
-watch(invoice, async ({ id }) => {
-  payments.value = await $fetch("/api/payments", { query: { invoiceId: id } });
-});
+watch(filters, async ({ invoice, category }) => {
+  const query = clearObject({ invoiceId: invoice.id, category: category.id });
 
-const currentPage = ref(1);
-const tableData = computed(() => {
-  if (!payments.value) return [];
-  return paginate(payments.value, currentPage.value).map((i) => ({
-    ...i,
-    amount: i.amount.toFixed(2),
-    date: formatDate(new Date(i.date)),
-  }));
+  payments.value = await $fetch("/api/payments", { query });
 });
-const columns = [
-  { key: "date", label: "Data" },
-  { key: "amount", label: "Valor" },
-  { key: "title", label: "Título" },
-  { key: "category", label: "Categoria" },
-];
 
 const importModal = ref(false);
 const files = ref([]);
@@ -49,6 +46,22 @@ const importFiles = async () => {
     );
   });
 };
+
+const currentPage = ref(1);
+const tableData = computed(() => {
+  if (!payments.value) return [];
+  return paginate(payments.value, currentPage.value).map((i) => ({
+    ...i,
+    amount: formatMoney(i.amount),
+    date: formatDate(new Date(i.date)),
+  }));
+});
+const columns = [
+  { key: "date", label: "Data" },
+  { key: "amount", label: "Valor" },
+  { key: "title", label: "Título" },
+  { key: "category", label: "Categoria" },
+];
 </script>
 
 <template>
@@ -56,14 +69,15 @@ const importFiles = async () => {
     <h1 class="text-xl font-semibold">Pagamentos</h1>
     <u-divider class="mb-6 mt-2" />
 
-    <div class="flex justify-between mb-6">
+    <div class="flex items-end justify-between mb-6">
       <div class="flex items-center gap-2">
-        <u-select-menu
-          v-if="invoices && invoices.length"
-          v-model="invoice"
-          :options="invoicesOptions"
-          placeholder="Selecionar fatura"
-        />
+        <u-form-group label="Selecionar fatura">
+          <u-select-menu v-if="invoices && invoices.length" v-model="filters.invoice" :options="invoicesOptions" />
+        </u-form-group>
+
+        <u-form-group label="Selecionar categoria">
+          <u-select-menu v-model="filters.category" :options="categoryOptions" />
+        </u-form-group>
       </div>
       <u-button icon="material-symbols:drive-folder-upload-outline" label="Importar" @click="importModal = true" />
     </div>
