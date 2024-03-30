@@ -15,6 +15,8 @@ const generalPieData = computed(() => {
     <h1 class="text-xl font-semibold">Gráficos</h1>
     <u-divider class="mb-6 mt-2" />
 
-    <chart-general-pie :data="generalPieData" />
+    <div class="w-1/2">
+      <chart-general-pie :data="generalPieData" />
+    </div>
   </div>
 </template>
