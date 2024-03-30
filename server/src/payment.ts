@@ -24,7 +24,16 @@ class Payment {
   }
 
   async getCategories() {
-    const categories = await prisma.payment.groupBy({ by: ["category"], where: { amount: { gt: 0 } } });
+    const categories = await prisma.payment.groupBy({ by: "category", where: { amount: { gt: 0 } } });
+    return categories;
+  }
+
+  async getAmountByCategory() {
+    const categories = await prisma.payment.groupBy({
+      by: "category",
+      where: { amount: { gt: 0 } },
+      _sum: { amount: true },
+    });
     return categories;
   }
 }
