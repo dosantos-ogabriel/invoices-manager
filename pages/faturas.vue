@@ -5,7 +5,13 @@ const columns = [
   { key: "year", label: "Ano" },
   { key: "month", label: "Mês" },
   { key: "bank", label: "Banco" },
+  { key: "amount", label: "Valor" },
 ];
+
+const tableData = computed(() => {
+  if (!invoices.value) return [];
+  return invoices.value.map((invoice) => ({ ...invoice, amount: formatMoney(invoice.amount) }));
+});
 </script>
 
 <template>
@@ -16,7 +22,7 @@ const columns = [
     <u-table
       v-if="invoices && invoices.length"
       :columns="columns"
-      :rows="invoices"
+      :rows="tableData"
       :sort="{ column: 'date', direction: 'desc' }"
     />
   </div>

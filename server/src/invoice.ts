@@ -1,13 +1,19 @@
+import { Prisma } from "@prisma/client";
 import { z } from "zod";
 import prisma from "./database";
-import { Prisma } from "@prisma/client";
 
 class Invoice {
   async list() {
     const invoices = await prisma.invoice.findMany({
       orderBy: [{ year: "desc" }, { month: "desc" }],
+      include: {
+        payments: { where: { amount: { gte: 0 } } },
+      },
     });
-    return invoices;
+    return invoices.map((invoice) => ({
+      ...invoice,
+      amount: invoice.payments.reduce((acc, cur) => acc + cur.amount, 0),
+    }));
   }
 
   async addInvoice(body: Prisma.InvoiceCreateInput) {
